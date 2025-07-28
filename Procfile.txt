@@ -1,0 +1,1 @@
+worker: python herve_bot.py
