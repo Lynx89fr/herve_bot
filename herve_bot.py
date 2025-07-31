@@ -3,14 +3,10 @@ import random, re, os
 
 TOKEN = os.getenv("TOKEN", "TON_TOKEN_ICI")
 
-# Charger les répliques
 with open("repliques.txt", "r", encoding="utf-8") as f:
     repliques = [line.strip() for line in f if line.strip()]
 
-# Tous les fichiers MP4 (pour "Hervé" et "Hervé parle")
 mp4_files = [f"audios/{f}" for f in os.listdir("audios") if f.endswith(".mp4")]
-
-# Vraies vidéos pour "bouboule"
 videos = [f"videos/{f}" for f in os.listdir("videos") if f.endswith(".mp4")]
 
 dernieres_repliques, derniers_mp4, dernieres_videos = [], [], []
@@ -43,12 +39,10 @@ async def repond_hervé(update, context):
         await update.message.reply_video(video=open(fichier, "rb"))
         return
 
-    # 🎤 Cas spécial "Hervé parle" → seulement un MP4
     if re.search(r"\b(hervé|rv)\b", message, re.IGNORECASE):
         if "parle" in message and mp4_files:
             await envoyer_mp4(update)
         else:
-            # Réponse aléatoire texte ou MP4
             if random.choice([True, False]):
                 await update.message.reply_text(choisir_replique())
             else:
@@ -57,5 +51,5 @@ async def repond_hervé(update, context):
 app = ApplicationBuilder().token(TOKEN).build()
 app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, repond_hervé))
 
-print("🤖 Hervé_Bot prêt : Hervé = texte ou mp4 / Hervé parle = mp4 / bouboule = vidéo 🎥")
+print("🤖 Hervé_Bot : tous les MP4 envoyés comme VIDÉO 🎥")
 app.run_polling()
