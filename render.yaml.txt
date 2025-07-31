@@ -1,0 +1,10 @@
+services:
+  - type: worker
+    name: herve-bot
+    env: python
+    plan: free
+    buildCommand: "pip install -r requirements.txt"
+    startCommand: "python herve_bot.py"
+    envVars:
+      - key: TOKEN
+        sync: false
