@@ -31,4 +31,38 @@ async def envoyer_audio(update):
     if fichier.endswith(".ogg"):
         await update.message.reply_voice(voice=open(fichier, "rb"))
     else:  # Si c'est un .mp4, on l'envoie comme vidéo
-        a
+        await update.message.reply_video(video=open(fichier, "rb"))
+
+async def envoyer_reponse(update):
+    choix = random.choice(["texte", "audio"])
+    if choix == "texte":
+        await update.message.reply_text(choisir_replique())
+    else:
+        await envoyer_audio(update)
+
+async def repond_hervé(update, context):
+    message = update.message.text.lower()
+
+    # ✅ Si le message contient "bouboulle" → toujours un audio/vidéo
+    if "bouboulle" in message:
+        await envoyer_audio(update)
+        return
+
+    # ✅ Si on répond à Hervé_Bot
+    if update.message.reply_to_message and update.message.reply_to_message.from_user.is_bot:
+        await envoyer_reponse(update)
+        return
+
+    # ✅ Si on écrit "Hervé" ou "RV"
+    if re.search(r"\b(hervé|rv)\b", message, re.IGNORECASE):
+        # Cas spécial "parle" → uniquement un audio/vidéo
+        if "parle" in message:
+            await envoyer_audio(update)
+            return
+        await envoyer_reponse(update)
+
+app = ApplicationBuilder().token(TOKEN).build()
+app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, repond_hervé))
+
+print("🤖 Hervé_Bot peut maintenant envoyer des MP4 comme des audios 🎉")
+app.run_polling()
